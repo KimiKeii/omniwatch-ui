@@ -1,3 +1,5 @@
+import StatRing from './components/StatRing'
+
 function App() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -18,28 +20,13 @@ function App() {
           <div className="flex gap-4">
 
             {/* Steps */}
-            <div className="w-16 h-16 rounded-full bg-gray-800 border-4 border-green-500 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-gray-900 flex flex-col items-center justify-center">
-                <span className="text-white text-xs font-bold">8,432</span>
-                <span className="text-gray-400 text-[9px]">Steps</span>
-              </div>
-            </div>
+             <StatRing label="Steps" value="8,432" target="10,000" color="border-green-500" />
 
             {/* Calories */}
-            <div className="w-16 h-16 rounded-full bg-gray-800 border-4 border-orange-500 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-gray-900 flex flex-col items-center justify-center">
-                <span className="text-white text-xs font-bold">420</span>
-                <span className="text-gray-400 text-[9px]">Cal</span>
-              </div>
-            </div>
+            <StatRing label="Calories" value="420" target="600" color="border-orange-500" />
 
             {/* Heart Rate */}
-            <div className="w-16 h-16 rounded-full bg-gray-800 border-4 border-red-500 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-gray-900 flex flex-col items-center justify-center">
-                <span className="text-white text-xs font-bold">72</span>
-                <span className="text-gray-400 text-[9px]">BPM</span>
-              </div>
-            </div>
+            <StatRing label="Heart Rate" value="72" target="120" color="border-red-500" />
 
           </div>
 
