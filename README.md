@@ -105,4 +105,3 @@ Unified Resilience Platform · May 2026
 
 ## Created by
 Earl Joshua V. Espinosa
-all rights Reserve
