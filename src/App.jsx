@@ -49,6 +49,31 @@ function App() {
     setLapTimes(prev => [...prev, formatTime(elapsed)])
   }
 
+  const [stats, setStats] = useState({
+    steps: 8432,
+    calories: 420,
+    heartRate: 72,
+  })
+
+  const handleSyncStats = () => {
+    setStats({
+      steps: Math.floor(Math.random() * 7001) + 5000,
+      calories: Math.floor(Math.random() * 601) + 200,
+      heartRate: Math.floor(Math.random() * 53) + 58,
+    })
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const delta = Math.floor(Math.random() * 10) - 5
+      setStats(prev => ({
+        ...prev,
+        heartRate: Math.min(110, Math.max(58, prev.heartRate + delta))
+      }))
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
       <WatchFrame>
@@ -67,10 +92,16 @@ function App() {
 
         {/* Stat rings — always visible */}
         <div className="flex gap-4">
-          <StatRing label="Steps" value="8,432" target="10,000" color="border-green-500" />
-          <StatRing label="Calories" value="420" target="600" color="border-orange-500" />
-          <StatRing label="Heart Rate" value="72" target="120" color="border-red-500" />
+          <StatRing label="Steps" value={stats.steps.toLocaleString()} target="10,000" color="border-green-500" />
+          <StatRing label="Calories" value={stats.calories} target="600" color="border-orange-500" />
+          <StatRing label="Heart Rate" value={stats.heartRate} target="120" color="border-red-500" />
         </div>
+        <button
+          className="text-xs px-3 py-1 rounded-full bg-blue-600 text-white mt-2"
+          onClick={handleSyncStats}
+        >
+          ↺ SYNC STATS
+        </button>
 
         {/* Stopwatch mode */}
         {currentMode === 'stopwatch' && (
