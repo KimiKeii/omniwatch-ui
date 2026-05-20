@@ -3,6 +3,7 @@ import TimeDisplay from './components/TimeDisplay'
 import StopwatchWidget from './components/StopwatchWidget'
 import StatRing from './components/StatRing'
 import ModeToggle from './components/ModeToggle'
+import useAnimatedCounter from './hooks/useAnimatedCounter'
 import { useState, useEffect, useCallback } from 'react'
 
 
@@ -82,6 +83,10 @@ function App() {
     heartRate: 72,
   })
 
+  const animatedSteps = useAnimatedCounter(stats.steps)
+  const animatedCalories = useAnimatedCounter(stats.calories)
+  const animatedHeartRate = useAnimatedCounter(stats.heartRate)
+
   const handleSyncStats = () => {
     setStats({
       steps: Math.floor(Math.random() * 7001) + 5000,
@@ -120,9 +125,9 @@ function App() {
 
         {/* Stat rings — always visible */}
         <div className="flex gap-4">
-          <StatRing label="Steps" value={stats.steps.toLocaleString()} target="10,000" color="border-green-500" />
-          <StatRing label="Calories" value={stats.calories} target="600" color="border-orange-500" />
-          <StatRing label="Heart Rate" value={stats.heartRate} target="120" color="border-red-500" />
+          <StatRing label="Steps" value={animatedSteps.toLocaleString()} target="10,000" color="border-green-500" />
+          <StatRing label="Calories" value={animatedCalories} target="600" color="border-orange-500" />
+          <StatRing label="Heart Rate" value={animatedHeartRate} target="120" color="border-red-500" />
         </div>
         <button
           className="text-xs px-3 py-1 rounded-full bg-blue-600 text-white mt-2"

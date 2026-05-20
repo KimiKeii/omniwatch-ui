@@ -85,3 +85,18 @@ A button that switches between clock and stopwatch view. Owns no state — deleg
 
 ### Example
 <ModeToggle currentMode="clock" onModeChange={setCurrentMode} />
+
+---
+
+## Recent Updates
+This section documents the latest feature updates and behavior changes.
+
+- `TimeDisplay` now supports toggling between 12-hour and 24-hour formats by clicking the clock display.
+- `App.jsx` added a global `keydown` listener so:
+  - `Space` starts/stops the stopwatch,
+  - `L` records a lap,
+  - `R` resets the stopwatch.
+- `StopwatchWidget` now highlights the fastest lap in green and the slowest lap in red.
+- Lap timing logic was updated to calculate fastest/slowest based on actual lap interval durations, not the current stopwatch total time.
+- Added a custom hook `useAnimatedCounter` to animate `steps`, `calories`, and `heartRate` values when `Sync Stats` updates them.
+- `StatRing` now displays animated numeric values instead of jumping instantly.
