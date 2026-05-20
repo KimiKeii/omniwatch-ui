@@ -4,9 +4,16 @@ import StopwatchWidget from './components/StopwatchWidget'
 import StatRing from './components/StatRing'
 import { useState, useEffect } from 'react'
 
+function formatTime(cs) {
+  const minutes = Math.floor(cs / 6000)
+  const seconds = Math.floor((cs % 6000) / 100)
+  const centiseconds = cs % 100
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`
+}
+
 function App() {
-  // Change this to 'clock' or 'stopwatch' to switch screens
-  const currentMode = 'clock'
+  const currentMode = 'stopwatch'
+
   const [time, setTime] = useState(new Date())
 
   useEffect(() => {
@@ -15,7 +22,31 @@ function App() {
     }, 1000)
     return () => clearInterval(interval)
   }, [])
-  
+
+  const [elapsed, setElapsed] = useState(0)
+  const [isRunning, setIsRunning] = useState(false)
+  const [lapTimes, setLapTimes] = useState([])
+
+  useEffect(() => {
+    if (!isRunning) return
+    const interval = setInterval(() => {
+      setElapsed(prev => prev + 10)
+    }, 100)
+    return () => clearInterval(interval)
+  }, [isRunning])
+
+
+  const handleStart = () => setIsRunning(true)
+  const handleStop = () => setIsRunning(false)
+  const handleReset = () => {
+    setIsRunning(false)
+    setElapsed(0)
+    setLapTimes([])
+  }
+  const handleLap = () => {
+    setLapTimes(prev => [...prev, formatTime(elapsed)])
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
       <WatchFrame>
@@ -40,9 +71,13 @@ function App() {
         {/* Stopwatch mode */}
         {currentMode === 'stopwatch' && (
           <StopwatchWidget
-            currentTime="01:23.45"
-            isRunning={false}
-            lapTimes={['00:58.20', '00:25.25']}
+            currentTime={formatTime(elapsed)}
+            isRunning={isRunning}
+            lapTimes={lapTimes}
+            onStart={handleStart}
+            onStop={handleStop}
+            onReset={handleReset}
+            onLap={handleLap}
           />
         )}
 
