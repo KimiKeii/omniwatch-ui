@@ -15,6 +15,11 @@ function formatTime(cs) {
 
 function App() {
   const [currentMode, setCurrentMode] = useState('clock')
+  const [timeFormat, setTimeFormat] = useState('12')
+
+  const handleToggleTimeFormat = useCallback(() => {
+    setTimeFormat(prevFormat => prevFormat === '12' ? '24' : '12')
+  }, [])
 
   const [time, setTime] = useState(new Date())
 
@@ -46,8 +51,30 @@ function App() {
     setLapTimes([])
   }, [])
   const handleLap = useCallback(() => {
-    setLapTimes(prev => [...prev, formatTime(elapsed)])
+    setLapTimes(prev => [...prev, elapsed])
   }, [elapsed])
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const key = event.key.toLowerCase()
+
+      if (key === ' ' || event.code === 'Space') {
+        event.preventDefault()
+        setIsRunning(prev => !prev)
+      }
+
+      if (key === 'l') {
+        handleLap()
+      }
+
+      if (key === 'r') {
+        handleReset()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleLap, handleReset])
 
   const [stats, setStats] = useState({
     steps: 8432,
@@ -86,7 +113,8 @@ function App() {
             hours={time.getHours()}
             minutes={String(time.getMinutes()).padStart(2, '0')}
             seconds={String(time.getSeconds()).padStart(2, '0')}
-            format="12"
+            format={timeFormat}
+            onToggleFormat={handleToggleTimeFormat}
           />
         )}
 
