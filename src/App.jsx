@@ -2,18 +2,32 @@ import WatchFrame from './components/WatchFrame'
 import TimeDisplay from './components/TimeDisplay'
 import StopwatchWidget from './components/StopwatchWidget'
 import StatRing from './components/StatRing'
+import { useState, useEffect } from 'react'
 
 function App() {
   // Change this to 'clock' or 'stopwatch' to switch screens
-  const currentMode = 'stopwatch'
+  const currentMode = 'clock'
+  const [time, setTime] = useState(new Date())
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(new Date())
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
+  
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
       <WatchFrame>
 
         {/* Clock mode */}
         {currentMode === 'clock' && (
-          <TimeDisplay hours="22" minutes="42" seconds="05" format="12" />
+          <TimeDisplay
+            hours={time.getHours()}
+            minutes={String(time.getMinutes()).padStart(2, '0')}
+            seconds={String(time.getSeconds()).padStart(2, '0')}
+            format="12"
+          />
         )}
 
         {/* Stat rings — always visible */}
