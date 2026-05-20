@@ -3,7 +3,7 @@ import TimeDisplay from './components/TimeDisplay'
 import StopwatchWidget from './components/StopwatchWidget'
 import StatRing from './components/StatRing'
 import ModeToggle from './components/ModeToggle'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 
 function formatTime(cs) {
@@ -38,16 +38,16 @@ function App() {
   }, [isRunning])
 
 
-  const handleStart = () => setIsRunning(true)
-  const handleStop = () => setIsRunning(false)
-  const handleReset = () => {
+  const handleStart = useCallback(() => setIsRunning(true), [])
+  const handleStop = useCallback(() => setIsRunning(false), [])
+  const handleReset = useCallback(() => {
     setIsRunning(false)
     setElapsed(0)
     setLapTimes([])
-  }
-  const handleLap = () => {
+  }, [])
+  const handleLap = useCallback(() => {
     setLapTimes(prev => [...prev, formatTime(elapsed)])
-  }
+  }, [elapsed])
 
   const [stats, setStats] = useState({
     steps: 8432,
@@ -75,7 +75,7 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: 'radial-gradient(circle at center, #000000 0%, #0d0d0d 40%, #2d0a5e 75%, #6b21a8a1 190%)' }}>
       <WatchFrame>
         {/* Mode toggle */}
           <ModeToggle currentMode={currentMode} onModeChange={setCurrentMode} />
