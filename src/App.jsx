@@ -2,7 +2,9 @@ import WatchFrame from './components/WatchFrame'
 import TimeDisplay from './components/TimeDisplay'
 import StopwatchWidget from './components/StopwatchWidget'
 import StatRing from './components/StatRing'
+import ModeToggle from './components/ModeToggle'
 import { useState, useEffect } from 'react'
+
 
 function formatTime(cs) {
   const minutes = Math.floor(cs / 6000)
@@ -12,7 +14,7 @@ function formatTime(cs) {
 }
 
 function App() {
-  const currentMode = 'stopwatch'
+  const [currentMode, setCurrentMode] = useState('clock')
 
   const [time, setTime] = useState(new Date())
 
@@ -50,6 +52,8 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
       <WatchFrame>
+        {/* Mode toggle */}
+          <ModeToggle currentMode={currentMode} onModeChange={setCurrentMode} />
 
         {/* Clock mode */}
         {currentMode === 'clock' && (
