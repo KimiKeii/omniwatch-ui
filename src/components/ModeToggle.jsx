@@ -1,6 +1,6 @@
 function ModeToggle({ currentMode, onModeChange }) {
   const nextMode = currentMode === 'clock' ? 'stopwatch' : 'clock'
-  const label = currentMode === 'clock' ? 'Stopwatch ▶' : '◀ Clock'
+  const label = currentMode === 'clock' ? 'Stopwatch' : 'Clock'
 
   return (
     <button
