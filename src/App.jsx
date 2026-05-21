@@ -1,11 +1,10 @@
+import { useState, useEffect, useCallback } from 'react'
 import WatchFrame from './components/WatchFrame'
 import TimeDisplay from './components/TimeDisplay'
 import StopwatchWidget from './components/StopwatchWidget'
 import StatRing from './components/StatRing'
 import ModeToggle from './components/ModeToggle'
 import useAnimatedCounter from './hooks/useAnimatedCounter'
-import { useState, useEffect, useCallback } from 'react'
-
 
 function formatTime(cs) {
   const minutes = Math.floor(cs / 6000)
@@ -39,10 +38,9 @@ function App() {
     if (!isRunning) return
     const interval = setInterval(() => {
       setElapsed(prev => prev + 1)
-    }, 100)
+    }, 10)
     return () => clearInterval(interval)
   }, [isRunning])
-
 
   const handleStart = useCallback(() => setIsRunning(true), [])
   const handleStop = useCallback(() => setIsRunning(false), [])
@@ -53,26 +51,18 @@ function App() {
   }, [])
   const handleLap = useCallback(() => {
     setLapTimes(prev => [...prev, elapsed])
-  }, [elapsed])
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       const key = event.key.toLowerCase()
-
       if (key === ' ' || event.code === 'Space') {
         event.preventDefault()
         setIsRunning(prev => !prev)
       }
-
-      if (key === 'l') {
-        handleLap()
-      }
-
-      if (key === 'r') {
-        handleReset()
-      }
+      if (key === 'l') handleLap()
+      if (key === 'r') handleReset()
     }
-
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleLap, handleReset])
@@ -109,10 +99,7 @@ function App() {
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'radial-gradient(circle at center, #000000 0%, #0d0d0d 40%, #2d0a5e 75%, #6b21a8a1 190%)' }}>
       <WatchFrame>
-        {/* Mode toggle */}
-          <ModeToggle currentMode={currentMode} onModeChange={setCurrentMode} />
-
-        {/* Clock mode */}
+        <ModeToggle currentMode={currentMode} onModeChange={setCurrentMode} />
         {currentMode === 'clock' && (
           <TimeDisplay
             hours={time.getHours()}
@@ -122,12 +109,10 @@ function App() {
             onToggleFormat={handleToggleTimeFormat}
           />
         )}
-
-        {/* Stat rings — always visible */}
         <div className="flex gap-4">
           <StatRing label="Steps" value={animatedSteps.toLocaleString()} target="10,000" color="border-green-500" />
-          <StatRing label="Calories" value={animatedCalories} target="600" color="border-orange-500" />
-          <StatRing label="Heart Rate" value={animatedHeartRate} target="120" color="border-red-500" />
+          <StatRing label="Calories" value={animatedCalories.toLocaleString()} target="600" color="border-orange-500" />
+          <StatRing label="Heart Rate" value={animatedHeartRate.toLocaleString()} target="120" color="border-red-500" />
         </div>
         <button
           className="text-xs px-3 py-1 rounded-full bg-blue-600 text-white mt-2"
@@ -135,8 +120,6 @@ function App() {
         >
           ↺ SYNC STATS
         </button>
-
-        {/* Stopwatch mode */}
         {currentMode === 'stopwatch' && (
           <StopwatchWidget
             currentTime={formatTime(elapsed)}
@@ -148,7 +131,6 @@ function App() {
             onLap={handleLap}
           />
         )}
-
       </WatchFrame>
     </div>
   )
