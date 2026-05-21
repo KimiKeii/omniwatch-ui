@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import WatchFrame from './components/WatchFrame'
 import TimeDisplay from './components/TimeDisplay'
 import StopwatchWidget from './components/StopwatchWidget'
@@ -34,24 +34,35 @@ function App() {
   const [isRunning, setIsRunning] = useState(false)
   const [lapTimes, setLapTimes] = useState([])
 
-  useEffect(() => {
-    if (!isRunning) return
-    const interval = setInterval(() => {
-      setElapsed(prev => prev + 1)
-    }, 10)
-    return () => clearInterval(interval)
-  }, [isRunning])
+  const intervalRef = useRef(null)     
+  const elapsedRef = useRef(0)         
 
-  const handleStart = useCallback(() => setIsRunning(true), [])
-  const handleStop = useCallback(() => setIsRunning(false), [])
-  const handleReset = useCallback(() => {
-    setIsRunning(false)
-    setElapsed(0)
-    setLapTimes([])
-  }, [])
-  const handleLap = useCallback(() => {
-    setLapTimes(prev => [...prev, elapsed])
-  }, [])
+const handleStart = useCallback(() => {
+  setIsRunning(true)
+  intervalRef.current = setInterval(() => {
+    elapsedRef.current += 1
+    setElapsed(elapsedRef.current)   
+  }, 10)
+}, [])
+
+const handleStop = useCallback(() => {
+  setIsRunning(false)
+  clearInterval(intervalRef.current)
+  intervalRef.current = null
+}, [])
+
+const handleReset = useCallback(() => {
+  setIsRunning(false)
+  clearInterval(intervalRef.current)
+  intervalRef.current = null
+  elapsedRef.current = 0
+  setElapsed(0)
+  setLapTimes([])
+}, [])
+
+const handleLap = useCallback(() => {
+  setLapTimes(prev => [...prev, elapsedRef.current])  
+}, [])
 
   useEffect(() => {
     const handleKeyDown = (event) => {
