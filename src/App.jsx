@@ -38,7 +38,7 @@ function App() {
   useEffect(() => {
     if (!isRunning) return
     const interval = setInterval(() => {
-      setElapsed(prev => prev + 10)
+      setElapsed(prev => prev + 1)
     }, 100)
     return () => clearInterval(interval)
   }, [isRunning])
