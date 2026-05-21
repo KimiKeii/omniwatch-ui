@@ -1,7 +1,7 @@
 # OmniWatch Components
 
 ## WatchFrame
-The outer shell styled like a physical smartwatch. Wraps all other components.
+The outer shell styled like a physical round smartwatch. Wraps all other components, with a purple gradient fading in background.
 
 ### Props
 | Prop | Type | Description |
@@ -16,7 +16,7 @@ The outer shell styled like a physical smartwatch. Wraps all other components.
 ---
 
 ## TimeDisplay
-Shows the current time. Supports both 12hr and 24hr format.
+Shows the current time and current date. Supports both 12hr and 24hr format.
 
 ### Props
 | Prop | Type | Description |
@@ -48,18 +48,55 @@ A circular progress indicator for fitness stats. Used 3 times with different pro
 ---
 
 ## StopwatchWidget
-A stopwatch screen showing current time and lap times.
+A stopwatch screen showing current time, lap times, and control buttons.
 
 ### Props
 | Prop | Type | Description |
-|-------------|---------|--------------------------------------|
-| currentTime | string | The stopwatch time to display |
+|-------------|------------|--------------------------------------|
+| currentTime | string | Formatted elapsed time e.g. "01:23.45" |
 | isRunning | boolean | Changes text to green when true |
-| lapTimes | array | List of lap time strings to display |
+| lapTimes | string[] | List of lap time strings to display only one lap time, Scrollable |
+| onStart | () => void | Called when Start button is pressed |
+| onStop | () => void | Called when Stop button is pressed |
+| onReset | () => void | Called when Reset button is pressed |
+| onLap | () => void | Called when Lap button is pressed |
 
 ### Example
 <StopwatchWidget
   currentTime="01:23.45"
   isRunning={false}
   lapTimes={['00:58.20', '00:25.25']}
+  onStart={() => {}}
+  onStop={() => {}}
+  onReset={() => {}}
+  onLap={() => {}}
 />
+
+---
+
+## ModeToggle
+A button that switches between clock and stopwatch view. Owns no state — delegates control to App.jsx.
+
+### Props
+| Prop | Type | Description |
+|--------------|------------|--------------------------------------|
+| currentMode | string | Either 'clock' or 'stopwatch' |
+| onModeChange | (mode: string) => void | Called with the next mode on click |
+
+### Example
+<ModeToggle currentMode="clock" onModeChange={setCurrentMode} />
+
+---
+
+## Recent Updates
+This section documents the latest feature updates and behavior changes.
+
+- `TimeDisplay` now supports toggling between 12-hour and 24-hour formats by clicking the clock display.
+- `App.jsx` added a global `keydown` listener so:
+  - `Space` starts/stops the stopwatch,
+  - `L` records a lap,
+  - `R` resets the stopwatch.
+- `StopwatchWidget` now highlights the fastest lap in green and the slowest lap in red.
+- Lap timing logic was updated to calculate fastest/slowest based on actual lap interval durations, not the current stopwatch total time.
+- Added a custom hook `useAnimatedCounter` to animate `steps`, `calories`, and `heartRate` values when `Sync Stats` updates them.
+- `StatRing` now displays animated numeric values instead of jumping instantly.
