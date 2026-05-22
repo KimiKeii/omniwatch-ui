@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useReducer } from 'react'
 import WatchFrame from './components/WatchFrame'
 import TimeDisplay from './components/TimeDisplay'
 import StopwatchWidget from './components/StopwatchWidget'
 import StatRing from './components/StatRing'
 import ModeToggle from './components/ModeToggle'
 import useAnimatedCounter from './hooks/useAnimatedCounter'
+import { stopwatchReducer, initialState } from './stopwatchReducer' // ← add this
 
 function formatTime(cs) {
   const minutes = Math.floor(cs / 6000)
@@ -30,38 +31,35 @@ function App() {
     return () => clearInterval(interval)
   }, [])
 
-  const [elapsed, setElapsed] = useState(0)
-  const [isRunning, setIsRunning] = useState(false)
-  const [lapTimes, setLapTimes] = useState([])
+  const [state, dispatch] = useReducer(stopwatchReducer, initialState)
+  const { elapsed, isRunning, lapTimes } = state   
 
-  const intervalRef = useRef(null)     
-  const elapsedRef = useRef(0)         
+  const intervalRef = useRef(null)   
+  const elapsedRef = useRef(0)       
 
 const handleStart = useCallback(() => {
-  setIsRunning(true)
+  dispatch({ type: 'START' })
   intervalRef.current = setInterval(() => {
     elapsedRef.current += 1
-    setElapsed(elapsedRef.current)   
+    dispatch({ type: 'TICK' })   
   }, 10)
 }, [])
 
 const handleStop = useCallback(() => {
-  setIsRunning(false)
+  dispatch({ type: 'STOP' })
   clearInterval(intervalRef.current)
   intervalRef.current = null
 }, [])
 
 const handleReset = useCallback(() => {
-  setIsRunning(false)
+  dispatch({ type: 'RESET' })   
   clearInterval(intervalRef.current)
   intervalRef.current = null
   elapsedRef.current = 0
-  setElapsed(0)
-  setLapTimes([])
 }, [])
 
 const handleLap = useCallback(() => {
-  setLapTimes(prev => [...prev, elapsedRef.current])  
+  dispatch({ type: 'LAP' })
 }, [])
 
   useEffect(() => {
@@ -69,7 +67,11 @@ const handleLap = useCallback(() => {
       const key = event.key.toLowerCase()
       if (key === ' ' || event.code === 'Space') {
         event.preventDefault()
-        setIsRunning(prev => !prev)
+        if (isRunning) {
+          handleStop()
+        } else {
+          handleStart()
+        }
       }
       if (key === 'l') handleLap()
       if (key === 'r') handleReset()
