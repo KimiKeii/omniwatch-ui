@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useRef, useReducer } from 'react'
+import { useWatch } from './context/WatchContext'
 import WatchFrame from './components/WatchFrame'
 import TimeDisplay from './components/TimeDisplay'
 import StopwatchWidget from './components/StopwatchWidget'
 import StatRing from './components/StatRing'
 import ModeToggle from './components/ModeToggle'
 import useAnimatedCounter from './hooks/useAnimatedCounter'
-import { stopwatchReducer, initialState } from './stopwatchReducer' // ← add this
+import { stopwatchReducer, initialState } from './stopwatchReducer' 
 
 function formatTime(cs) {
   const minutes = Math.floor(cs / 6000)
@@ -16,11 +17,11 @@ function formatTime(cs) {
 
 function App() {
   const [currentMode, setCurrentMode] = useState('clock')
-  const [timeFormat, setTimeFormat] = useState('12')
+  const { timeFormat, setTimeFormat } = useWatch()
 
   const handleToggleTimeFormat = useCallback(() => {
-    setTimeFormat(prevFormat => prevFormat === '12' ? '24' : '12')
-  }, [])
+    setTimeFormat(prev => prev === '12' ? '24' : '12')
+  }, [setTimeFormat])
 
   const [time, setTime] = useState(new Date())
 
@@ -78,7 +79,7 @@ const handleLap = useCallback(() => {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleLap, handleReset])
+  }, [handleLap, handleReset, handleStart, handleStop])
 
   const [stats, setStats] = useState({
     steps: 8432,
