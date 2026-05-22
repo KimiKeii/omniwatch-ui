@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useWatch } from './context/WatchContext'
+import { useStopwatch } from './hooks/useStopwatch'
+import { useStats } from './hooks/useStats'
 import WatchFrame from './components/WatchFrame'
 import TimeDisplay from './components/TimeDisplay'
 import StopwatchWidget from './components/StopwatchWidget'
 import StatRing from './components/StatRing'
 import ModeToggle from './components/ModeToggle'
-import useAnimatedCounter from './hooks/useAnimatedCounter'
 
 function formatTime(cs) {
   const minutes = Math.floor(cs / 6000)
@@ -15,11 +17,11 @@ function formatTime(cs) {
 
 function App() {
   const [currentMode, setCurrentMode] = useState('clock')
-  const [timeFormat, setTimeFormat] = useState('12')
+  const { timeFormat, setTimeFormat } = useWatch()
 
   const handleToggleTimeFormat = useCallback(() => {
-    setTimeFormat(prevFormat => prevFormat === '12' ? '24' : '12')
-  }, [])
+    setTimeFormat(prev => prev === '12' ? '24' : '12')
+  }, [setTimeFormat])
 
   const [time, setTime] = useState(new Date())
 
@@ -30,71 +32,26 @@ function App() {
     return () => clearInterval(interval)
   }, [])
 
-  const [elapsed, setElapsed] = useState(0)
-  const [isRunning, setIsRunning] = useState(false)
-  const [lapTimes, setLapTimes] = useState([])
-
-  useEffect(() => {
-    if (!isRunning) return
-    const interval = setInterval(() => {
-      setElapsed(prev => prev + 1)
-    }, 10)
-    return () => clearInterval(interval)
-  }, [isRunning])
-
-  const handleStart = useCallback(() => setIsRunning(true), [])
-  const handleStop = useCallback(() => setIsRunning(false), [])
-  const handleReset = useCallback(() => {
-    setIsRunning(false)
-    setElapsed(0)
-    setLapTimes([])
-  }, [])
-  const handleLap = useCallback(() => {
-    setLapTimes(prev => [...prev, elapsed])
-  }, [])
+  const { elapsed, isRunning, lapTimes, handleStart, handleStop, handleReset, handleLap } = useStopwatch()
+  const { animatedSteps, animatedCalories, animatedHeartRate, handleSyncStats } = useStats()
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       const key = event.key.toLowerCase()
       if (key === ' ' || event.code === 'Space') {
         event.preventDefault()
-        setIsRunning(prev => !prev)
+        if (isRunning) {
+          handleStop()
+        } else {
+          handleStart()
+        }
       }
       if (key === 'l') handleLap()
       if (key === 'r') handleReset()
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleLap, handleReset])
-
-  const [stats, setStats] = useState({
-    steps: 8432,
-    calories: 420,
-    heartRate: 72,
-  })
-
-  const animatedSteps = useAnimatedCounter(stats.steps)
-  const animatedCalories = useAnimatedCounter(stats.calories)
-  const animatedHeartRate = useAnimatedCounter(stats.heartRate)
-
-  const handleSyncStats = () => {
-    setStats({
-      steps: Math.floor(Math.random() * 7001) + 5000,
-      calories: Math.floor(Math.random() * 601) + 200,
-      heartRate: Math.floor(Math.random() * 53) + 58,
-    })
-  }
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const delta = Math.floor(Math.random() * 10) - 5
-      setStats(prev => ({
-        ...prev,
-        heartRate: Math.min(110, Math.max(58, prev.heartRate + delta))
-      }))
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [])
+  }, [handleLap, handleReset, handleStart, handleStop, isRunning])
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'radial-gradient(circle at center, #000000 0%, #0d0d0d 40%, #2d0a5e 75%, #6b21a8a1 190%)' }}>
